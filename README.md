@@ -6,3 +6,12 @@
 * [Node](https://nodejs.org/en/docs/) and [Express](https://expressjs.com/) for Back-End
 * [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) for cloud database
 * [Plaid](https://www.mongodb.com/cloud/atlas) for linking bank accounts and transaction data
+
+### Project setup
+```
+// Install dependencies for server and client
+npm install && npm run client-install
+
+// Run client and server with concurrently
+npm run dev 
+```
