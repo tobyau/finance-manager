@@ -27,6 +27,19 @@ var PUBLIC_TOKEN = null;
 var ACCESS_TOKEN = null;
 var ITEM_ID = null;
 
+// route GET api/plaid/accounts
+// Get all accounts linked with plaid for specific user
+// Private
+router.get(
+  "/accounts",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Account.find({ userId: req.user.id })
+      .then(accounts => res.json(accounts))
+      .catch(err => console.log(err));
+  }
+);
+
 // route POST api/plaid/accounts/add
 // Trades public token for access token and stores credentials in database
 // Private
@@ -35,28 +48,25 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     PUBLIC_TOKEN = req.body.public_token;
-
     const userId = req.user.id;
-
     const institution = req.body.metadata.institution;
     const { name, institution_id } = institution;
 
-    if(PUBLIC_TOKEN) {
+    if (PUBLIC_TOKEN) {
       client
         .exchangePublicToken(PUBLIC_TOKEN)
         .then(exchangeResponse => {
           ACCESS_TOKEN = exchangeResponse.access_token;
           ITEM_ID = exchangeResponse.item_id;
-          // check if account already exists for specific user
+          // Check if account already exists for specific user
           Account.findOne({
             userId: req.user.id,
             institutionId: institution_id
           })
             .then(account => {
-              if(account) {
+              if (account) {
                 console.log("Account already exists");
-              }
-              else {
+              } else {
                 const newAccount = new Account({
                   userId: userId,
                   accessToken: ACCESS_TOKEN,
@@ -67,9 +77,9 @@ router.post(
                 newAccount.save().then(account => res.json(account));
               }
             })
-            .catch(err => console.log(err));
+            .catch(err => console.log(err)); // Mongo Error
         })
-        .catch(err => console.log(err));
+        .catch(err => console.log(err)); // Plaid Error
     }
   }
 );
@@ -86,19 +96,6 @@ router.delete(
     })
   }
 )
-
-// route GET api/plaid/accounts
-// Get all accounts linked with plaid for specific user
-// Private
-router.get(
-  "/accounts",
-  passport.authenticate("jwt", { session: false }),
-  (req,res) => {
-    Account.find({ userId: req.user.id})
-      .then(accounts => res.json(accounts))
-      .catch(err => console.log(err));
-  }
-);
 
 // route POST api/plaid/accounts/transactions
 // Fetch transactions from past 30 days from all linked accounts
