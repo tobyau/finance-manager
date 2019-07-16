@@ -7,6 +7,7 @@ import { getAccounts, addAccount } from "../../actions/accountActions";
 
 import Accounts from "./Accounts";
 import Spinner from "./Spinner";
+// import PieChart from "./PieChart";
 
 class Dashboard extends Component {
 
@@ -38,7 +39,11 @@ class Dashboard extends Component {
     }
     else if (accounts.length > 0) {
       // User has accounts linked
-      dashboardContent = <Accounts user={user} accounts={accounts} />
+      dashboardContent = (
+        <div>
+          <Accounts user={user} accounts={accounts} />
+        </div>
+      );
     }
     else {
       // User has no accounts linked
